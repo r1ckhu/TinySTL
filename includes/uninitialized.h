@@ -1,12 +1,19 @@
 #ifndef _UNINITIALIZED_H_
 #define _UNINITIALIZED_H_
 #include <wchar.h>
+
 #include <algorithm>
+
 #include "construct.h"
 #include "iterator.h"
 #include "type_traits.h"
 
 namespace tinystl {
+// declare
+template <class ForwardIterator, class Size, class T, class T1>
+inline ForwardIterator __uninitialized_fill_n(ForwardIterator first, Size n,
+                                              const T& x, T1*);
+
 template <class ForwardIterator, class Size, class T>
 inline ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n,
                                             const T& x) {
@@ -24,7 +31,7 @@ template <class ForwardIterator, class Size, class T>
 inline ForwardIterator __uninitialized_fill_n_aux(ForwardIterator first, Size n,
                                                   const T& x, _true_type) {
    // TODO:
-   // return fill_n(first,n,x);
+   return std::fill_n(first,n,x);
 }
 
 template <class ForwardIterator, class Size, class T>
@@ -37,6 +44,12 @@ inline ForwardIterator __uninitialized_fill_n_aux(ForwardIterator first, Size n,
    }
    return cur;
 }
+
+// declare
+template <class InputIterator, class ForwardIterator, class T>
+inline ForwardIterator __uninitialized_copy(InputIterator first,
+                                            InputIterator last,
+                                            ForwardIterator result, T*);
 
 template <class InputIterator, class ForwardIterator>
 inline ForwardIterator uninitialized_copy(InputIterator first,

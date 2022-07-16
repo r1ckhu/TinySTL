@@ -1,7 +1,7 @@
 #ifndef _CONSTRUCT_H_
 #define _CONSTRUCT_H_
 #include <new>
-
+#include "iterator.h"
 #include "type_traits.h"
 
 namespace tinystl {
@@ -10,15 +10,23 @@ inline void construct(T1* p, T2& value) {
    new (p) T1(value);
 }
 
+template <class T>
+inline void destroy(T* p) {
+   p->~T();
+}
+
+// declare
+template <class ForwardIterator, class T>
+inline void _destroy(ForwardIterator first, ForwardIterator last, T*);
+
 template <class ForwardIterator>
-inline void destory(ForwardIterator first, ForwardIterator last) {
-   typedef typename _type_traits<ForwardIterator>::value_type value_type;
+inline void destroy(ForwardIterator first, ForwardIterator last) {
    _destroy(first, last, value_type(first));
 }
 
 template <class ForwardIterator, class T>
-inline void _destory(ForwardIterator first, ForwardIterator last, T*) {
-   typedef typename _type_traits<T>::has_trival_destructor trival_destructor;
+inline void _destroy(ForwardIterator first, ForwardIterator last, T*) {
+   typedef typename _type_traits<T>::has_trivial_destructor trival_destructor;
    _destroy_aux(first, last,
                 trival_destructor());  // aux: auxiliary adj./v. = supplementary
 }

@@ -162,7 +162,7 @@ void* __default_alloc_template<threads, inst>::allocate(size_t n) {
 // return the space to free-list
 template <bool threads, int inst>
 void __default_alloc_template<threads, inst>::deallocate(void* p, size_t n) {
-   obj* q = static_cast<obj*>(p);
+   obj* q = reinterpret_cast<obj*>(p);
    obj* volatile* my_free_list;
 
    if (n > static_cast<size_t>(__MAX_BYTES)) {
@@ -190,12 +190,12 @@ void* __default_alloc_template<threads, inst>::refill(size_t n) {
    // else prepare to put new chunks into free-list
    my_free_list = free_list + FREELIST_INDEX(n);
 
-   result = static_cast<obj*>(chunk);
+   result = reinterpret_cast<obj*>(chunk);
    // the next chunk will be the head of my_free_list
-   *my_free_list = next_obj = static_cast<obj*>(chunk + n);
+   *my_free_list = next_obj = reinterpret_cast<obj*>(chunk + n);
    for (i = 1;; i++) {
       current_obj = next_obj;
-      next_obj = static_cast<obj*>(static_cast<char*>(next_obj) + n);
+      next_obj = reinterpret_cast<obj*>(reinterpret_cast<char*>(next_obj) + n);
       if (nobjs - 1 == i) {
          current_obj->free_list_link = 0;
          break;
@@ -231,12 +231,12 @@ char* __default_alloc_template<threads, inst>::chunk_alloc(size_t size,
       // try to put the remain bytes into free-list
       if (bytes_left > 0) {
          obj* volatile* my_free_list = free_list + FREELIST_INDEX(bytes_left);
-         static_cast<obj*>(start_free)->free_list_link = *my_free_list;
-         *my_free_list = static_cast<obj*>(start_free);
+         reinterpret_cast<obj*>(start_free)->free_list_link = *my_free_list;
+         *my_free_list = reinterpret_cast<obj*>(start_free);
       }
 
       // get some new space
-      start_free = static_cast<char*>(std::malloc(bytes_to_get));
+      start_free = reinterpret_cast<char*>(std::malloc(bytes_to_get));
       if (0 == start_free) {
          // no enough space in heap
          int i;
@@ -249,7 +249,7 @@ char* __default_alloc_template<threads, inst>::chunk_alloc(size_t size,
             p = *my_free_list;
             if (0 != p) {
                *my_free_list = p->free_list_link;
-               start_free = static_cast<char*>(p);
+               start_free = reinterpret_cast<char*>(p);
                end_free = start_free + i;
                // recurisve to fix nobjs
                return (chunk_alloc(size, nobjs));
@@ -259,7 +259,7 @@ char* __default_alloc_template<threads, inst>::chunk_alloc(size_t size,
       // no memory to use in anywhere
       end_free = 0;
       // try the oom_allocate in malloc_alloc
-      start_free = static_cast<char*>(malloc_alloc::allocate(bytes_to_get));
+      start_free = reinterpret_cast<char*>(malloc_alloc::allocate(bytes_to_get));
       // this will either throw exception or solve the oom problem
       heap_size += bytes_to_get;
       end_free = start_free + bytes_to_get;
