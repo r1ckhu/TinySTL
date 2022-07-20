@@ -1,6 +1,8 @@
 #include <iostream>
-#include "test.h"
+
+#include "tests\list_test.h"
+#include "tests\vector_test.h"
 int main(int, char**) {
-    test::vector_test();
+   test::list_test();
    return 0;
 };

@@ -1,3 +1,5 @@
+#ifndef _RTEST_H_
+#define _RTEST_H_
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -32,7 +34,8 @@ class Tester {
       return distribution(generator);
    }
 };
-std::vector<std::pair<std::string, std::function<void(void)>>> Tester::test_cases;
+std::vector<std::pair<std::string, std::function<void(void)>>>
+    Tester::test_cases;
 
 template <class T>
 void EQUAL(T x, T y) {
@@ -56,3 +59,4 @@ void CONTAINER_EQUAL(T1& con1, T2& con2) {
 }
 
 };  // namespace rtest
+#endif
